@@ -84,14 +84,8 @@
     .ocr-data strong {
       color: var(--text-primary);
     }
-    .ocr-team-blue {
-      color: var(--info);
-      font-weight: 700;
-    }
-    .ocr-team-red {
-      color: var(--danger);
-      font-weight: 700;
-    }
+    .ocr-team-blue { color: var(--info); font-weight: 700; }
+    .ocr-team-red { color: var(--danger); font-weight: 700; }
     .ocr-player-list {
       margin: 4px 0 0 12px;
       font-family: monospace;
@@ -152,7 +146,6 @@
       <h2 id="room-title" style="justify-content: center;">LOBBY ROOM</h2>
       <div id="auto-close-timer" class="timer-display" style="display:none;">⏱ 5:00 үлдсэн</div>
       
-      <!-- HOST CONTROLS -->
       <div id="host-controls" style="display: none; background: rgba(255,85,0,0.08); padding: 20px; border-radius: var(--radius-md); margin: 20px 0; border: 1px solid rgba(255,85,0,0.3);">
         <p style="margin:0 0 12px 0; color: var(--accent); font-weight: 700;">
           👑 Та өрөөний Host — Moonton-с Match ID авна уу:
@@ -166,7 +159,6 @@
         </div>
       </div>
 
-      <!-- QR ХЭСЭГ -->
       <div class="qr-box">
         <div id="qr-container" style="display: none;">
           <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
@@ -194,10 +186,9 @@
 
       <!-- 📸 SCREENSHOT OCR ХЭСЭГ -->
       <div id="screenshot-section" class="screenshot-section" style="display: none;">
-        <h3>📸 Эсвэл Screenshot-аас уншуулах</h3>
+        <h3>📸 Screenshot-аас үр дүн оруулах</h3>
         <p>
-          Тоглолтын үр дүнгийн screenshot-ыг оруулна уу 
-          (<strong>play.mobilelegends.com</strong>-с авсан).
+          Тоглолт дууссаны дараа <strong>play.mobilelegends.com</strong>-с үр дүнгийн screenshot авч энд оруулна уу.
         </p>
         
         <input type="file" id="screenshot-input" accept="image/*">
@@ -232,15 +223,8 @@
           </div>
         </div>
       </div>
-
-      <!-- ELO БОДОХ (Moonton API) -->
-      <button id="btn-sync-result" class="btn-sync" style="margin-top: 20px; padding: 14px 32px;">
-        🔄 Moonton API-с ELO Бодох
-      </button>
-      <p id="sync-status" style="font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: center;"></p>
     </div>
 
-    <!-- БАГУУД -->
     <div class="teams-grid">
       <div class="team-box radiant">
         <h3 style="display:flex; justify-content:space-between; align-items:center;">

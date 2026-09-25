@@ -20,7 +20,7 @@ let ocrResult = null;
 if (!lobbyId) window.location.href = "lobbies.html";
 
 // ============================================================
-// AUTH + USER DATA
+// AUTH
 // ============================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -73,22 +73,15 @@ function listenLobby() {
 
     document.getElementById("room-title").innerText = `${currentLobby.host_name}-ийн Өрөө`;
 
-    // Host эсэх
     const isHost = currentUser.uid === currentLobby.host_uid;
-    if (isHost) {
-      document.getElementById("host-controls").style.display = "block";
-    } else {
-      document.getElementById("host-controls").style.display = "none";
-    }
+    document.getElementById("host-controls").style.display = isHost ? "block" : "none";
 
-    // Auto-close timer (зөвхөн host, Match ID ороогүй)
     if (!currentLobby.moonton_match_id && isHost) {
       startAutoCloseTimer();
     } else {
       stopAutoCloseTimer();
     }
 
-    // Match ID байвал QR + OCR хэсэг харуулах
     if (currentLobby.moonton_match_id) {
       document.getElementById("qr-placeholder").style.display = "none";
       document.getElementById("qr-container").style.display = "block";
@@ -103,10 +96,9 @@ function listenLobby() {
         enterLink.href = `https://play.mobilelegends.com/match/#/room?id=${currentLobby.moonton_match_id}&from=list`;
       }
 
-      // OCR хэсэг зөвхөн host (эсвэл radiant[0]) -д харагдана
+      // OCR хэсэг зөвхөн host эсвэл radiant[0] -д
       const canSync = isHost || currentUser.uid === currentLobby.team_radiant?.[0]?.uid;
       document.getElementById("screenshot-section").style.display = canSync ? "block" : "none";
-      document.getElementById("btn-sync-result").style.display = canSync ? "inline-block" : "none";
     }
 
     renderTeam("team-radiant-list", currentLobby.team_radiant || []);
@@ -178,7 +170,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 // ============================================================
-// TEAM RENDER
+// RENDER
 // ============================================================
 function renderTeam(elemId, players) {
   const container = document.getElementById(elemId);
@@ -203,7 +195,7 @@ function renderTeam(elemId, players) {
 }
 
 // ============================================================
-// HOST MATCH ID ХАДГАЛАХ
+// MATCH ID ХАДГАЛАХ
 // ============================================================
 document.getElementById("btn-save-id").addEventListener("click", async () => {
   const mId = document.getElementById("input-moonton-id").value.trim();
@@ -331,7 +323,6 @@ if (screenshotInput) {
       const rawText = result.data.text;
       console.log("=== OCR Raw Text ===");
       console.log(rawText);
-      console.log("====================");
 
       ocrResult = parseMatchScreenshot(rawText);
       console.log("Parsed:", ocrResult);
@@ -350,7 +341,6 @@ if (screenshotInput) {
   });
 }
 
-// OCR текстээс мэдээлэл задлах
 function parseMatchScreenshot(text) {
   const lines = text.split('\n').map(l => l.trim()).filter(l => l);
   const fullText = lines.join(' ');
@@ -363,7 +353,6 @@ function parseMatchScreenshot(text) {
     redPlayers: []
   };
 
-  // Victory тодорхойлох
   if (/blue\s*team[\s\S]{0,30}victory/i.test(fullText) || 
       /victory[\s\S]{0,30}blue\s*team/i.test(fullText)) {
     result.winner = "Blue";
@@ -372,7 +361,6 @@ function parseMatchScreenshot(text) {
     result.winner = "Red";
   }
 
-  // Score олох (жишээ: "1 VS 0")
   const scoreMatch = fullText.match(/(\d+)\s*VS\s*(\d+)/i);
   if (scoreMatch) {
     result.blueScore = parseInt(scoreMatch[1]);
@@ -382,11 +370,9 @@ function parseMatchScreenshot(text) {
     }
   }
 
-  // IGN-үүдийг олох
   let section = null;
   
   lines.forEach((line) => {
-    // Section тодорхойлох
     if (/^blue\s*team$/i.test(line) || /^blue\s*team\s+victory/i.test(line)) {
       section = "blue";
       return;
@@ -395,7 +381,6 @@ function parseMatchScreenshot(text) {
       section = "red";
       return;
     }
-    // Section дахин тодорхойлох (Victory гэх мэт)
     if (/blue\s*team/i.test(line) && !/victory/i.test(line) && section !== "blue") {
       section = "blue";
       return;
@@ -405,12 +390,10 @@ function parseMatchScreenshot(text) {
       return;
     }
 
-    // IGN-ийг таних
     const cleaned = line
       .replace(/[^\w\s\u0080-\uFFFF✿✦★☆|._-]/g, '')
       .trim();
     
-    // Шалгуурууд
     const isIGN = 
       cleaned.length >= 2 &&
       cleaned.length <= 25 &&
@@ -419,7 +402,6 @@ function parseMatchScreenshot(text) {
       !/^\d{2}:\d{2}/.test(cleaned) &&
       !/^\d+\s+vs\s+\d+$/i.test(cleaned) &&
       /[a-zA-Z\u0080-\uFFFF]/.test(cleaned) &&
-      // Дор хаяж 2 үсэг (тоо, тэмдэгт биш)
       (cleaned.match(/[a-zA-Z\u0080-\uFFFF]/g) || []).length >= 2;
 
     if (section === "blue" && isIGN && result.bluePlayers.length < 5) {
@@ -433,7 +415,6 @@ function parseMatchScreenshot(text) {
     }
   });
 
-  // Score-с winner дахин шалгах
   if (!result.winner && (result.blueScore > 0 || result.redScore > 0)) {
     result.winner = result.blueScore > result.redScore ? "Blue" : "Red";
   }
@@ -441,7 +422,6 @@ function parseMatchScreenshot(text) {
   return result;
 }
 
-// OCR үр дүнг UI-д харуулах
 function displayOCRResult(data) {
   const resultBox = document.getElementById("ocr-result");
   const dataBox = document.getElementById("ocr-data");
@@ -475,7 +455,6 @@ function displayOCRResult(data) {
     </div>
   `;
 
-  // Анхааруулга
   if (!data.winner) {
     html += `<div class="ocr-warning">⚠ Ялагч тодорхойгүй — гараар засах шаардлагатай</div>`;
   }
@@ -485,7 +464,6 @@ function displayOCRResult(data) {
 
   dataBox.innerHTML = html;
 
-  // Гараар засах form
   let editHTML = `
     <div style="margin-bottom: 8px;">
       <label style="font-size: 12px; color: var(--text-muted);">🏆 Ялагч:</label>
@@ -495,11 +473,11 @@ function displayOCRResult(data) {
       </select>
     </div>
     <div style="margin-bottom: 8px;">
-      <label style="font-size: 12px; color: var(--info);">🔵 Blue IGN-үүд (таслалаар тусгаарлана):</label>
+      <label style="font-size: 12px; color: var(--info);">🔵 Blue IGN-үүд (таслалаар):</label>
       <input type="text" id="ocr-edit-blue" value="${data.bluePlayers.join(', ')}" style="padding: 6px; width: 100%; font-size: 12px;">
     </div>
     <div style="margin-bottom: 8px;">
-      <label style="font-size: 12px; color: var(--danger);">🔴 Red IGN-үүд (таслалаар тусгаарлана):</label>
+      <label style="font-size: 12px; color: var(--danger);">🔴 Red IGN-үүд (таслалаар):</label>
       <input type="text" id="ocr-edit-red" value="${data.redPlayers.join(', ')}" style="padding: 6px; width: 100%; font-size: 12px;">
     </div>
   `;
@@ -509,7 +487,6 @@ function displayOCRResult(data) {
   resultBox.style.display = "block";
 }
 
-// OCR цэвэрлэх
 const btnClearOCR = document.getElementById("btn-clear-ocr");
 if (btnClearOCR) {
   btnClearOCR.addEventListener("click", () => {
@@ -519,7 +496,6 @@ if (btnClearOCR) {
   });
 }
 
-// OCR үр дүнг баталгаажуулах
 const btnApplyOCR = document.getElementById("btn-apply-ocr");
 if (btnApplyOCR) {
   btnApplyOCR.addEventListener("click", async () => {
@@ -528,7 +504,6 @@ if (btnApplyOCR) {
       return;
     }
 
-    // Гараар зассан утгуудыг авах
     const editWinner = document.getElementById("ocr-edit-winner")?.value;
     const editBlue = document.getElementById("ocr-edit-blue")?.value;
     const editRed = document.getElementById("ocr-edit-red")?.value;
@@ -555,7 +530,6 @@ if (btnApplyOCR) {
   });
 }
 
-// OCR үр дүнгээр ELO бодох
 async function applyOCRResultToELO(data) {
   const btn = document.getElementById("btn-apply-ocr");
   btn.disabled = true;
@@ -568,7 +542,6 @@ async function applyOCRResultToELO(data) {
     const alreadyProcessed = new Set();
 
     for (const ign of allIGNs) {
-      // Давхардлаас сэргийлэх
       if (alreadyProcessed.has(ign)) continue;
       alreadyProcessed.add(ign);
 
@@ -602,7 +575,6 @@ async function applyOCRResultToELO(data) {
       }
     }
 
-    // Lobby-г finished болгох
     await updateDoc(doc(db, "lobbies", lobbyId), { 
       status: "finished",
       win_team: data.winner,
@@ -625,74 +597,3 @@ async function applyOCRResultToELO(data) {
     btn.innerText = "✓ Баталгаажуулах & ELO Бодох";
   }
 }
-
-// ============================================================
-// MOONTON API-С ELO БОДОХ (нөөц арга)
-// ============================================================
-document.getElementById("btn-sync-result").addEventListener("click", async () => {
-  if (!currentLobby.moonton_match_id) {
-    alert("Match ID оруулаагүй байна!");
-    return;
-  }
-
-  const syncBtn = document.getElementById("btn-sync-result");
-  const statusText = document.getElementById("sync-status");
-  syncBtn.disabled = true;
-  syncBtn.innerText = "⏳ Үр дүн татаж байна...";
-  statusText.innerText = "Moonton API-с мэдээлэл татаж байна...";
-
-  try {
-    const moontonId = currentLobby.moonton_match_id;
-    const response = await fetch(`/api/mlbb-match?matchId=${moontonId}`);
-    
-    if (!response.ok) {
-      throw new Error(`Сервер алдаа: ${response.status}`);
-    }
-    
-    const data = await response.json();
-
-    if (!data || data.status !== 200 || !data.data) {
-      throw new Error(data?.message || "Тоглолт хараахан дуусаагүй эсвэл мэдээлэл олдсонгүй.");
-    }
-
-    const winTeam = data.data.win_team;
-    const playerList = data.data.player_list || [];
-    let updatedCount = 0;
-
-    for (const player of playerList) {
-      const q = query(collection(db, "users"), where("mlbb_id", "==", String(player.role_id)));
-      const snap = await getDocs(q);
-
-      if (!snap.empty) {
-        const uDoc = snap.docs[0];
-        const isWin = player.team === winTeam;
-        let elo = isWin ? 25 : -20;
-        if (player.is_mvp) elo += 5;
-
-        await updateDoc(doc(db, "users", uDoc.id), {
-          elo: increment(elo),
-          "stats.matches": increment(1),
-          "stats.wins": increment(isWin ? 1 : 0),
-          "stats.losses": increment(isWin ? 0 : 1),
-          "stats.mvp_count": increment(player.is_mvp ? 1 : 0)
-        });
-        updatedCount++;
-      }
-    }
-
-    await updateDoc(doc(db, "lobbies", lobbyId), { 
-      status: "finished",
-      win_team: winTeam
-    });
-
-    alert(`✅ Амжилттай! ${updatedCount} тоглогчийн ELO шинэчлэгдлээ.`);
-    syncBtn.innerText = "✓ Тоглолт Дууссан";
-    
-  } catch (err) {
-    console.error("Sync error:", err);
-    alert("Алдаа: " + err.message + "\n\n💡 Зөвлөмж: Screenshot-аас уншуулах хэсгийг ашиглана уу.");
-    syncBtn.disabled = false;
-    syncBtn.innerText = "🔄 Moonton API-с ELO Бодох";
-    statusText.innerText = "";
-  }
-});

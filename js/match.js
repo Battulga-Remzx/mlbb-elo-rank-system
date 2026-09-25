@@ -65,7 +65,6 @@ function listenMatchDetails() {
       if (direTitle) direTitle.innerHTML = "🔥 PLAYER 2 (DIRE)";
     }
 
-    // Match ID байвал QR + OCR харуулах
     if (currentMatchData.moonton_match_id) {
       document.getElementById("lobby-wait-msg").style.display = "none";
       document.getElementById("lobby-active-info").style.display = "block";
@@ -94,11 +93,6 @@ function listenMatchDetails() {
 
     if (currentMatchData.status === "finished") {
       document.getElementById("room-status-display").innerText = "STATUS: FINISHED";
-      const syncBtn = document.getElementById("btn-sync-result");
-      if (syncBtn) {
-        syncBtn.disabled = true;
-        syncBtn.innerText = "✓ Тоглолт Дууссан";
-      }
     }
 
     renderTeam("team-radiant-list", currentMatchData.team_radiant, captainUid, is1v1);
@@ -483,80 +477,4 @@ async function applyOCRResultToELO(data) {
     btn.disabled = false;
     btn.innerText = "✓ Баталгаажуулах & ELO Бодох";
   }
-}
-
-// ============================================================
-// MOONTON API-С ELO БОДОХ (нөөц)
-// ============================================================
-const syncBtn = document.getElementById("btn-sync-result");
-if (syncBtn) {
-  syncBtn.addEventListener("click", async () => {
-    const statusText = document.getElementById("sync-status");
-    
-    if (!currentMatchData || !currentMatchData.moonton_match_id) {
-      alert("Эхлээд Captain Moonton Match ID-г оруулсан байх шаардлагатай!");
-      return;
-    }
-
-    const moontonId = currentMatchData.moonton_match_id;
-    statusText.innerText = "⏳ play.mobilelegends.com-с тоглолтын үр дүн татаж байна...";
-    syncBtn.disabled = true;
-
-    try {
-      const response = await fetch(`/api/mlbb-match?matchId=${moontonId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Сервер алдаа: ${response.status}`);
-      }
-      
-      const data = await response.json();
-
-      if (!data || data.status !== 200 || !data.data) {
-        throw new Error(data?.message || "Тоглолт хараахан дуусаагүй эсвэл мэдээлэл олдсонгүй.");
-      }
-
-      const resultData = data.data;
-      const winningTeam = resultData.win_team; 
-      const playerList = resultData.player_list || [];
-
-      statusText.innerText = "⏳ Тоглогчдын ELO шинэчилж байна...";
-
-      let updatedCount = 0;
-      for (const player of playerList) {
-        const q = query(collection(db, "users"), where("mlbb_id", "==", String(player.role_id)));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const userDoc = querySnapshot.docs[0];
-          const isWinner = player.team === winningTeam;
-
-          let eloChange = isWinner ? 25 : -20;
-          if (player.is_mvp) eloChange += 5;
-
-          await updateDoc(doc(db, "users", userDoc.id), {
-            elo: increment(eloChange),
-            "stats.matches": increment(1),
-            "stats.wins": increment(isWinner ? 1 : 0),
-            "stats.losses": increment(isWinner ? 0 : 1),
-            "stats.mvp_count": increment(player.is_mvp ? 1 : 0)
-          });
-          updatedCount++;
-        }
-      }
-
-      await updateDoc(doc(db, "matches", roomMatchId), {
-        status: "finished",
-        win_team: winningTeam
-      });
-
-      statusText.innerText = `✅ Амжилттай! ${updatedCount} тоглогчийн ELO шинэчлэгдлээ.`;
-      alert(`Тоглолтын үр дүн бодогдож, ${updatedCount} тоглогчийн ELO оноо шинэчлэгдлээ!`);
-
-    } catch (error) {
-      console.error("Sync Error:", error);
-      statusText.innerText = `❌ Алдаа: ${error.message}`;
-      alert(`Алдаа гарлаа: ${error.message}\n\n💡 Зөвлөмж: Screenshot-аас уншуулах хэсгийг ашиглана уу.`);
-      syncBtn.disabled = false;
-    }
-  });
 }
