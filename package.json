@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "main": "api/verify-mlbb.js",
   "dependencies": {
-    "cekregml": "^1.0.3"
+    "cekregml": "latest"
   }
 }
