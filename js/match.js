@@ -11,6 +11,7 @@ const roomMatchId = urlParams.get("id");
 let currentUser = null;
 let currentMatchData = null;
 let ocrResult = null;
+let hasRedirected = false; // Давхар redirect-с сэргийлэх
 
 if (!roomMatchId) {
   window.location.replace("matchmaking.html");
@@ -29,17 +30,34 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ============================================================
-// MATCH LISTENER
+// MATCH LISTENER (match дууссан бол бүх тоглогч автоматаар гарна)
 // ============================================================
 function listenMatchDetails() {
   onSnapshot(doc(db, "matches", roomMatchId), (docSnap) => {
     if (!docSnap.exists()) {
-      alert("Match олдсонгүй.");
-      window.location.replace("matchmaking.html");
+      if (!hasRedirected) {
+        hasRedirected = true;
+        alert("Match олдсонгүй.");
+        window.location.replace("matchmaking.html");
+      }
       return;
     }
 
     currentMatchData = docSnap.data();
+
+    // ⚠️ Match finished бол бүх тоглогч автоматаар гарна
+    if (currentMatchData.status === "finished") {
+      if (hasRedirected) return;
+      hasRedirected = true;
+
+      const winText = currentMatchData.win_team 
+        ? `\n🏆 Ялагч: ${currentMatchData.win_team} Team` 
+        : "";
+      
+      alert(`🚪 Тоглолт дууссан.${winText}\n\nMatchmaking хуудас руу шилжиж байна...`);
+      window.location.replace("matchmaking.html");
+      return;
+    }
 
     const mode = currentMatchData.mode || "5v5";
     const is1v1 = mode === "1v1";
@@ -89,10 +107,6 @@ function listenMatchDetails() {
       if (ocrSection) {
         ocrSection.style.display = isCaptain ? "block" : "none";
       }
-    }
-
-    if (currentMatchData.status === "finished") {
-      document.getElementById("room-status-display").innerText = "STATUS: FINISHED";
     }
 
     renderTeam("team-radiant-list", currentMatchData.team_radiant, captainUid, is1v1);
@@ -456,20 +470,31 @@ async function applyOCRResultToELO(data) {
       }
     }
 
+    // ⚠️ Match-ийг finished болгох → listener бүх тоглогчийг автоматаар гаргана
     await updateDoc(doc(db, "matches", roomMatchId), { 
       status: "finished",
       win_team: data.winner,
       ocr_data: data,
-      finished_at: new Date().toISOString()
+      finished_at: new Date().toISOString(),
+      closed_at: new Date().toISOString()
     });
 
     let msg = `✅ Амжилттай! ${updatedCount} тоглогчийн ELO шинэчлэгдлээ.`;
     if (notFound.length > 0) {
       msg += `\n\n⚠ Олдоогүй IGN-үүд:\n${notFound.join('\n')}`;
     }
+    msg += `\n\n🚪 Match хаагдаж байна...`;
     
     alert(msg);
     btn.innerText = "✓ Дууссан";
+
+    // hasRedirected-г true болгосноор listener дахин redirect хийхгүй
+    hasRedirected = true;
+
+    // 2 секундын дараа matchmaking.html руу шилжих
+    setTimeout(() => {
+      window.location.replace("matchmaking.html");
+    }, 2000);
 
   } catch (err) {
     console.error("Apply OCR error:", err);

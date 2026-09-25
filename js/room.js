@@ -16,11 +16,12 @@ let currentLobby = null;
 let autoCloseTimer = null;
 let countdownInterval = null;
 let ocrResult = null;
+let hasRedirected = false; // Давхар redirect-с сэргийлэх
 
 if (!lobbyId) window.location.href = "lobbies.html";
 
 // ============================================================
-// AUTH
+// AUTH + USER DATA
 // ============================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -53,35 +54,49 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ============================================================
-// LOBBY LISTENER
+// LOBBY LISTENER (room хаагдсан бол автоматаар гарах)
 // ============================================================
 function listenLobby() {
   onSnapshot(doc(db, "lobbies", lobbyId), (docSnap) => {
     if (!docSnap.exists()) {
-      alert("Өрөө хаагдсан байна.");
-      window.location.href = "lobbies.html";
+      if (!hasRedirected) {
+        hasRedirected = true;
+        alert("Өрөө хаагдсан байна.");
+        window.location.href = "lobbies.html";
+      }
       return;
     }
 
     currentLobby = docSnap.data();
 
+    // ⚠️ Room finished/closed бол бүх тоглогч автоматаар гарна
     if (currentLobby.status === "closed" || currentLobby.status === "finished") {
-      alert("Энэ өрөө хаагдсан байна.");
+      if (hasRedirected) return;
+      hasRedirected = true;
+
+      const winText = currentLobby.win_team 
+        ? `\n🏆 Ялагч: ${currentLobby.win_team} Team` 
+        : "";
+      
+      alert(`🚪 Өрөө хаагдсан байна.${winText}\n\nLobbies хуудас руу шилжиж байна...`);
       window.location.href = "lobbies.html";
       return;
     }
 
     document.getElementById("room-title").innerText = `${currentLobby.host_name}-ийн Өрөө`;
 
+    // Host эсэх
     const isHost = currentUser.uid === currentLobby.host_uid;
     document.getElementById("host-controls").style.display = isHost ? "block" : "none";
 
+    // Auto-close timer (зөвхөн host, Match ID ороогүй)
     if (!currentLobby.moonton_match_id && isHost) {
       startAutoCloseTimer();
     } else {
       stopAutoCloseTimer();
     }
 
+    // Match ID байвал QR + OCR хэсэг харуулах
     if (currentLobby.moonton_match_id) {
       document.getElementById("qr-placeholder").style.display = "none";
       document.getElementById("qr-container").style.display = "block";
@@ -170,7 +185,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 // ============================================================
-// RENDER
+// TEAM RENDER
 // ============================================================
 function renderTeam(elemId, players) {
   const container = document.getElementById(elemId);
@@ -195,7 +210,7 @@ function renderTeam(elemId, players) {
 }
 
 // ============================================================
-// MATCH ID ХАДГАЛАХ
+// HOST MATCH ID ХАДГАЛАХ
 // ============================================================
 document.getElementById("btn-save-id").addEventListener("click", async () => {
   const mId = document.getElementById("input-moonton-id").value.trim();
@@ -575,20 +590,31 @@ async function applyOCRResultToELO(data) {
       }
     }
 
+    // ⚠️ Lobby-г finished болгох → listener бүх тоглогчийг автоматаар гаргана
     await updateDoc(doc(db, "lobbies", lobbyId), { 
       status: "finished",
       win_team: data.winner,
       ocr_data: data,
-      finished_at: new Date().toISOString()
+      finished_at: new Date().toISOString(),
+      closed_at: new Date().toISOString()
     });
 
     let msg = `✅ Амжилттай! ${updatedCount} тоглогчийн ELO шинэчлэгдлээ.`;
     if (notFound.length > 0) {
       msg += `\n\n⚠ Олдоогүй IGN-үүд (Firestore-д бүртгэлгүй):\n${notFound.join('\n')}`;
     }
+    msg += `\n\n🚪 Өрөө хаагдаж байна...`;
     
     alert(msg);
     btn.innerText = "✓ Дууссан";
+
+    // hasRedirected-г true болгосноор listener дахин redirect хийхгүй
+    hasRedirected = true;
+
+    // 2 секундын дараа lobbies.html руу шилжих
+    setTimeout(() => {
+      window.location.href = "lobbies.html";
+    }, 2000);
 
   } catch (err) {
     console.error("Apply OCR error:", err);
