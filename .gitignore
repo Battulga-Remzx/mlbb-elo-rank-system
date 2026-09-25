@@ -1,0 +1,14 @@
+# Firebase & Нууц түлхүүрүүд (Заавал нууна)
+firebase-config.js
+js/firebase-config.js
+.env
+.env.local
+
+# Node.js ба Vercel
+node_modules/
+.vercel/
+npm-debug.log*
+
+# Үйлдлийн системийн файлууд
+.DS_Store
+Thumbs.db

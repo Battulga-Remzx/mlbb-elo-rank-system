@@ -3,12 +3,12 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBak_J8KvoVwLW_HZPgz4lmr1SPoM07MQE",
+  authDomain: "bb-elo-rank-system.firebaseapp.com",
+  projectId: "bb-elo-rank-system",
+  storageBucket: "bb-elo-rank-system.firebasestorage.app",
+  messagingSenderId: "594065193475",
+  appId: "1:594065193475:web:5f7c800cce1eb51c852c36"
 };
 
 const app = initializeApp(firebaseConfig);
