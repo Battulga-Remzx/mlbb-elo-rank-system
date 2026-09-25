@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FACEIT MLBB - Match Room</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    body { background: #121214; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
+    nav { background: #1a1a1e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a30; }
+    .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+    .match-header { background: #1a1a1e; padding: 25px; border-radius: 12px; border: 1px solid #2a2a30; text-align: center; margin-bottom: 25px; }
+    .match-title { color: #ff5500; font-size: 24px; margin: 0 0 10px 0; }
+    .lobby-share-box { background: #22222a; border: 2px dashed #ff5500; padding: 20px; border-radius: 12px; margin: 20px 0; }
+    .qr-container { background: #fff; padding: 10px; border-radius: 8px; display: inline-block; margin: 15px 0; }
+    .qr-container img { width: 220px; height: 220px; display: block; }
+    .match-id-badge { background: #121214; border: 1px solid #ff5500; color: #00ff66; font-size: 20px; font-weight: bold; padding: 10px 20px; border-radius: 8px; letter-spacing: 1px; display: inline-block; margin-top: 5px; word-break: break-all; }
+    .input-group { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+    input { padding: 10px; border-radius: 6px; border: 1px solid #444; background: #121214; color: #fff; width: 260px; text-align: center; font-size: 15px; }
+    .btn-action { background: #ff5500; color: #fff; border: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+    .btn-sync { background: #00ff66; color: #000; border: none; padding: 12px 30px; font-weight: bold; font-size: 16px; border-radius: 6px; cursor: pointer; }
+    .btn-sync:disabled { background: #444; color: #888; cursor: not-allowed; }
+    .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .team-box { background: #1a1a1e; border-radius: 12px; border: 1px solid #2a2a30; padding: 20px; }
+    .team-box.radiant { border-top: 4px solid #00c853; }
+    .team-box.dire { border-top: 4px solid #ff1744; }
+    .player-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #2a2a30; font-size: 14px; align-items: center; }
+    .player-row:last-child { border-bottom: none; }
+    .captain-badge { background: #ff5500; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    @media (max-width: 700px) { .teams-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div style="font-weight: bold; color: #ff5500; font-size: 20px;">FACEIT MLBB</div>
+    <div id="room-status-display" style="color: #aaa; font-size: 14px;">STATUS: WAITING FOR LOBBY</div>
+  </nav>
+
+  <div class="container">
+    <div class="match-header">
+      <h2 class="match-title">5v5 TOURNAMENT LOBBY</h2>
+      
+      <div id="captain-control" style="display: none; background: #222; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+        <p style="margin: 0 0 10px 0; color: #ff5500; font-weight: bold;">👑 Та энэ тоглолтын Captain тул Moonton дээр өрөө үүсгэнэ үү:</p>
+        <a href="https://play.mobilelegends.com/match/" target="_blank" class="btn-action" style="text-decoration: none; display: inline-block; background: #2196f3;">
+          🌐 play.mobilelegends.com нээх
+        </a>
+        <div class="input-group">
+          <input type="text" id="input-moonton-id" placeholder="Moonton-оос авсан Match ID-гаа оруулна уу">
+          <button id="btn-publish-id" class="btn-action">Нийтлэх (Share)</button>
+        </div>
+      </div>
+
+      <div class="lobby-share-box">
+        <div id="lobby-wait-msg" style="color: #aaa;">
+          ⏳ Captain Moonton дээр өрөө үүсгэж Match ID оруултал хүлээнэ үү...
+        </div>
+
+        <div id="lobby-active-info" style="display: none;">
+          <p style="margin: 0; color: #aaa; font-size: 14px;">Гар утасны MLBB тоглоомоо нээж уншуулах эсвэл Match ID-аар орно уу:</p>
+          <div class="qr-container">
+            <img id="qr-image" src="" alt="Moonton Lobby QR Code">
+          </div>
+          <div>
+            <span style="font-size: 12px; color: #888; display: block;">MATCH ROOM ID:</span>
+            <div id="display-match-id" class="match-id-badge">-----</div>
+          </div>
+          <br>
+          <a id="enter-lobby-link" href="#" target="_blank" class="btn-action" style="text-decoration: none; display: inline-block; background: #2196f3;">
+            🌐 Enter Lobby (Web)
+          </a>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button id="btn-sync-result" class="btn-sync">🔄 Тоглолт дууссан → ELO Бодох</button>
+        <p id="sync-status" style="font-size: 12px; color: #aaa; margin-top: 8px;"></p>
+      </div>
+    </div>
+
+    <div class="teams-grid">
+      <div class="team-box radiant">
+        <h3 style="color: #00c853; margin-top: 0;">TEAM RADIANT</h3>
+        <div id="team-radiant-list">Ачаалж байна...</div>
+      </div>
+      <div class="team-box dire">
+        <h3 style="color: #ff1744; margin-top: 0;">TEAM DIRE</h3>
+        <div id="team-dire-list">Ачаалж байна...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/match.js"></script>
+</body>
+</html>

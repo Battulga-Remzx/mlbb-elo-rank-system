@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FACEIT MLBB - Lobby Room</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    body { background: #121214; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
+    nav { background: #1a1a1e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a30; }
+    .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+    .room-header { background: #1a1a1e; padding: 25px; border-radius: 12px; border: 1px solid #2a2a30; text-align: center; margin-bottom: 25px; }
+    .timer-display { background: #222; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-top: 10px; color: #ffbb00; font-weight: bold; }
+    .qr-box { background: #222; border: 2px dashed #ff5500; padding: 20px; border-radius: 12px; margin: 20px 0; display: inline-block; width: 80%; max-width: 500px; }
+    .qr-img { width: 220px; height: 220px; background: #fff; padding: 10px; border-radius: 8px; margin: 10px auto; display: block; }
+    .btn-action { background: #ff5500; color: #fff; border: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+    .btn-sync { background: #00c853; color: #000; border: none; padding: 12px 28px; font-weight: bold; font-size: 16px; border-radius: 6px; cursor: pointer; margin-top: 15px; }
+    .btn-sync:disabled { background: #444; color: #888; cursor: not-allowed; }
+    .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .team-box { background: #1a1a1e; border-radius: 12px; border: 1px solid #2a2a30; padding: 20px; }
+    .team-box.radiant { border-top: 4px solid #00c853; }
+    .team-box.dire { border-top: 4px solid #ff1744; }
+    .player-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a30; font-size: 14px; align-items: center; }
+    .player-row:last-child { border-bottom: none; }
+    @media (max-width: 700px) { .teams-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div style="font-weight: bold; color: #ff5500; font-size: 20px;">FACEIT MLBB</div>
+    <div><a href="lobbies.html" style="color:#aaa; text-decoration:none;">← Өрөөнөөс гарах</a></div>
+  </nav>
+
+  <div class="container">
+    <div class="room-header">
+      <h2 id="room-title">LOBBY ROOM</h2>
+      <div id="auto-close-timer" class="timer-display" style="display:none;">⏱ 5:00 үлдсэн</div>
+      
+      <div id="host-controls" style="display: none; background: #222; padding: 15px; border-radius: 8px; margin: 15px 0;">
+        <p style="margin:0 0 10px 0; color:#ff5500;">👑 Та өрөөний Host тул Moonton дээр Match нээж ID-гаа оруулна уу:</p>
+        <a href="https://play.mobilelegends.com/match/" target="_blank" style="color:#2196f3; font-weight:bold;">1. play.mobilelegends.com дээр өрөө үүсгэх</a><br><br>
+        <input type="text" id="input-moonton-id" placeholder="Moonton Match ID оруулна уу" style="padding:8px; width:220px;">
+        <button id="btn-save-id" class="btn-action">QR Үүсгэх & Шарлах</button>
+      </div>
+
+      <div class="qr-box">
+        <div id="qr-container" style="display: none;">
+          <p style="margin: 0; color: #aaa;">Утсаараа MLBB-ийн Камераар уншуулж орно уу:</p>
+          <img id="qr-image" class="qr-img" src="" alt="QR Code">
+          <div>MATCH ID: <strong id="display-match-id" style="color: #00ff66; font-size: 20px; word-break: break-all;">-----</strong></div>
+          <br>
+          <a id="enter-lobby-link" href="#" target="_blank" class="btn-action" style="text-decoration: none; display: inline-block; background: #2196f3;">
+            🌐 Enter Lobby (Web)
+          </a>
+        </div>
+        <div id="qr-placeholder" style="color: #888;">
+          ⏳ Host хараахан Match ID оруулаагүй байна...
+        </div>
+      </div>
+
+      <div>
+        <button id="btn-sync-result" class="btn-sync">🔄 Тоглолт Дууссан → ELO Бодох</button>
+      </div>
+    </div>
+
+    <div class="teams-grid">
+      <div class="team-box radiant">
+        <h3 style="color: #00c853; margin-top: 0; display:flex; justify-content:space-between; align-items:center;">
+          <span>TEAM RADIANT</span>
+          <button id="btn-join-radiant" class="btn-action" style="font-size:12px;">Энэ багт орох</button>
+        </h3>
+        <div id="team-radiant-list">Хоосон байна...</div>
+      </div>
+
+      <div class="team-box dire">
+        <h3 style="color: #ff1744; margin-top: 0; display:flex; justify-content:space-between; align-items:center;">
+          <span>TEAM DIRE</span>
+          <button id="btn-join-dire" class="btn-action" style="font-size:12px;">Энэ багт орох</button>
+        </h3>
+        <div id="team-dire-list">Хоосон байна...</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/room.js"></script>
+</body>
+</html>

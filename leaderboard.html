@@ -2,29 +2,54 @@
 <html lang="mn">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FACEIT MLBB - Leaderboard</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #2a2a30; }
-    th { color: #888; }
+    body { background: #121214; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
+    nav { background: #1a1a1e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a30; flex-wrap: wrap; gap: 10px; }
+    nav a { color: #aaa; text-decoration: none; margin-left: 20px; font-weight: bold; }
+    nav a.active { color: #ff5500; }
+    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    table { width: 100%; border-collapse: collapse; background: #1a1a1e; border-radius: 8px; overflow: hidden; border: 1px solid #2a2a30; }
+    th, td { padding: 15px; text-align: left; border-bottom: 1px solid #2a2a30; }
+    th { background: #222228; color: #ff5500; }
+    .rank-1 { color: #ffd700; font-weight: bold; }
+    .rank-2 { color: #c0c0c0; font-weight: bold; }
+    .rank-3 { color: #cd7f32; font-weight: bold; }
+    @media (max-width: 700px) { th, td { padding: 8px; font-size: 13px; } }
   </style>
 </head>
 <body>
-  <div class="navbar">
-    <div class="logo">FACEIT MLBB</div>
-    <div class="nav-links"><a href="dashboard.html">Dashboard</a><a href="leaderboard.html" class="active">Leaderboard</a></div>
-  </div>
 
-  <div style="background: #1a1a1e; padding: 25px; border-radius: 12px; border: 1px solid #2a2a30;">
-    <h3 style="color: #ff5500;">ТОП 100 ТОГЛОГЧИД</h3>
+  <nav>
+    <div style="font-weight: bold; color: #ff5500; font-size: 20px;">FACEIT MLBB</div>
+    <div>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="lobbies.html">Lobbies</a>
+      <a href="matchmaking.html">Matchmaking</a>
+      <a href="leaderboard.html" class="active">Leaderboard</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2>TOP PLAYERS LEADERBOARD</h2>
     <table>
       <thead>
-        <tr><th>#</th><th>Тоглогч</th><th>Level</th><th>Elo</th></tr>
+        <tr>
+          <th># Rank</th>
+          <th>Player IGN</th>
+          <th>MLBB ID</th>
+          <th>Level</th>
+          <th>Elo Rating</th>
+        </tr>
       </thead>
-      <tbody id="lb-table"></tbody>
+      <tbody id="leaderboard-body">
+        <tr><td colspan="5" style="text-align: center; color: #888;">Ачаалж байна...</td></tr>
+      </tbody>
     </table>
   </div>
+
   <script type="module" src="js/leaderboard.js"></script>
 </body>
 </html>
