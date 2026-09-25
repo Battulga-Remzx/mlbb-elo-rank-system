@@ -12,98 +12,29 @@ import {
   where 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Vercel Serverless Function-ийн харьцангуй зам (Relative Path)
-const VERIFY_API_URL = "/api/verify-mlbb";
-
 let isSignUp = false;
-let verifiedIGN = null; // API-аар баталгаажсан тоглоомын нэрийг хадгалах хувьсагч
 
-// 1. Login / Register хэлбэрүүдийн хооронд шилжих (Toggle)
 const toggleBtn = document.getElementById("toggle-btn");
 const formTitle = document.getElementById("form-title");
-const mlbbVerifySection = document.getElementById("mlbb-verify-section");
+const signupFields = document.getElementById("signup-fields");
 const btnSubmit = document.getElementById("btn-submit");
 
+// 1. Нэвтрэх / Бүртгүүлэх горим шилжүүлэх
 if (toggleBtn) {
   toggleBtn.addEventListener("click", () => {
     isSignUp = !isSignUp;
     formTitle.innerText = isSignUp ? "CREATE ACCOUNT" : "FACEIT LOGIN";
-    mlbbVerifySection.style.display = isSignUp ? "block" : "none";
+    signupFields.style.display = isSignUp ? "block" : "none";
     btnSubmit.innerText = isSignUp ? "Бүртгүүлэх" : "Нэвтрэх";
     toggleBtn.innerText = isSignUp ? "Бүртгэлтэй юу? Нэвтрэх" : "Шинээр бүртгүүлэх";
-    
-    // Шилжихэд өмнөх шалгалтын үр дүнг цэвэрлэх
-    verifiedIGN = null;
-    const resultBox = document.getElementById("verify-result");
-    if (resultBox) resultBox.style.display = "none";
   });
 }
 
-// 2. MLBB ID & Server ID-г Vercel API-аар шалгаж IGN татах
-const btnCheckMlbb = document.getElementById("btn-check-mlbb");
-if (btnCheckMlbb) {
-  btnCheckMlbb.addEventListener("click", async () => {
-    const mlbbIdInput = document.getElementById("mlbb-id");
-    const zoneIdInput = document.getElementById("zone-id");
-    const resultBox = document.getElementById("verify-result");
-    const ignDisplay = document.getElementById("fetched-ign");
-
-    const mlbbId = mlbbIdInput ? mlbbIdInput.value.trim() : "";
-    const zoneId = zoneIdInput ? zoneIdInput.value.trim() : "";
-
-    if (!mlbbId || !zoneId) {
-      alert("MLBB ID болон Server ID-г оруулна уу!");
-      return;
-    }
-
-    // Төлөвийг уншиж байна болгох
-    resultBox.style.display = "block";
-    ignDisplay.className = "ign-status";
-    ignDisplay.innerText = "⏳ MLBB Серверээс шалгаж байна...";
-    btnCheckMlbb.disabled = true;
-
-    try {
-      const response = await fetch(VERIFY_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          mlbb_id: mlbbId,
-          zone_id: zoneId,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        verifiedIGN = data.username; // Автоматаар олдсон тоглоомын нэр
-        ignDisplay.className = "ign-status ign-found";
-        ignDisplay.innerText = `🎮 ${verifiedIGN}`;
-      } else {
-        verifiedIGN = null;
-        ignDisplay.className = "ign-status ign-error";
-        ignDisplay.innerText = `❌ ${data.message || "MLBB акаунт олдсонгүй"}`;
-      }
-    } catch (error) {
-      console.error("API Error:", error);
-      verifiedIGN = null;
-      ignDisplay.className = "ign-status ign-error";
-      ignDisplay.innerText = "❌ Сервертэй холбогдоход алдаа гарлаа.";
-    } finally {
-      btnCheckMlbb.disabled = false;
-    }
-  });
-}
-
-// 3. Нэвтрэх эсвэл Бүртгүүлэх үйлдэл хийх
+// 2. Нэвтрэх эсвэл Бүртгүүлэх үйлдэл
 if (btnSubmit) {
   btnSubmit.addEventListener("click", async () => {
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-
-    const email = emailInput ? emailInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value : "";
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
     if (!email || !password) {
       alert("Имэйл болон нууц үгээ бүрэн оруулна уу!");
@@ -112,26 +43,19 @@ if (btnSubmit) {
 
     try {
       if (isSignUp) {
-        const mlbbIdInput = document.getElementById("mlbb-id");
-        const zoneIdInput = document.getElementById("zone-id");
-        const mlbbId = mlbbIdInput ? mlbbIdInput.value.trim() : "";
-        const zoneId = zoneIdInput ? zoneIdInput.value.trim() : "";
+        const ign = document.getElementById("ign").value.trim();
+        const mlbbId = document.getElementById("mlbb-id").value.trim();
+        const zoneId = document.getElementById("zone-id").value.trim();
 
-        // Шаардлагатай баталгаажуулалтууд
-        if (!mlbbId || !zoneId) {
-          alert("MLBB ID болон Server ID-гаа оруулна уу!");
-          return;
-        }
-
-        if (!verifiedIGN) {
-          alert("Эхлээд 'Тоглоомын нэр шалгах' товч дээр дарж MLBB акаунтаа баталгаажуулна уу!");
+        if (!ign || !mlbbId || !zoneId) {
+          alert("Тоглоомын нэр, MLBB ID болон Server ID-г бүрэн оруулна уу!");
           return;
         }
 
         btnSubmit.innerText = "Бүртгэж байна...";
         btnSubmit.disabled = true;
 
-        // Firestore дээр MLBB ID давхардсан эсэхийг шалгах
+        // MLBB ID системд өмнө нь бүртгэгдсэн эсэхийг шалгах
         const q = query(
           collection(db, "users"), 
           where("mlbb_id", "==", mlbbId), 
@@ -140,21 +64,21 @@ if (btnSubmit) {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          alert("Энэ MLBB ID өөр аккаунт дээр бүртгэгдсэн байна!");
+          alert("Энэ MLBB ID системд аль хэдийн бүртгэгдсэн байна!");
           btnSubmit.innerText = "Бүртгүүлэх";
           btnSubmit.disabled = false;
           return;
         }
 
-        // Firebase Auth дээр шинэ хэрэглэгч үүсгэх
+        // Firebase Auth дээр хэрэглэгч үүсгэх
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Firestore дээр хэрэглэгчийн баталгаажсан профиль хадгалах
+        // Firestore дээр мэдээллийг хадгалах
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: email,
-          ign: verifiedIGN,         // Auto-fetched MLBB Name
+          ign: ign,
           mlbb_id: mlbbId,
           zone_id: zoneId,
           elo: 1000,
@@ -168,11 +92,11 @@ if (btnSubmit) {
           created_at: new Date().toISOString()
         });
 
-        alert(`Амжилттай бүртгэгдлээ! Тавтай морил, ${verifiedIGN}`);
+        alert(`Амжилттай бүртгэгдлээ! Тавтай морил, ${ign}`);
       } else {
         btnSubmit.innerText = "Нэвтэрч байна...";
         btnSubmit.disabled = true;
-        
+
         // Firebase Auth нэвтрэх
         await signInWithEmailAndPassword(auth, email, password);
       }
@@ -189,7 +113,6 @@ if (btnSubmit) {
   });
 }
 
-// Алдааны мессежийг монгол хэл рүү хөрвүүлэх функц
 function getErrorMessage(code) {
   switch (code) {
     case "auth/email-already-in-use":
