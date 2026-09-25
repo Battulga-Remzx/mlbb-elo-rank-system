@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>FACEIT MLBB - Leaderboard</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #2a2a30; }
+    th { color: #888; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">FACEIT MLBB</div>
+    <div class="nav-links"><a href="dashboard.html">Dashboard</a><a href="leaderboard.html" class="active">Leaderboard</a></div>
+  </div>
+
+  <div style="background: #1a1a1e; padding: 25px; border-radius: 12px; border: 1px solid #2a2a30;">
+    <h3 style="color: #ff5500;">ТОП 100 ТОГЛОГЧИД</h3>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Тоглогч</th><th>Level</th><th>Elo</th></tr>
+      </thead>
+      <tbody id="lb-table"></tbody>
+    </table>
+  </div>
+  <script type="module" src="js/leaderboard.js"></script>
+</body>
+</html>

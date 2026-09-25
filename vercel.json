@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/verify-mlbb",
+      "destination": "/api/verify-mlbb.js"
+    }
+  ]
+}

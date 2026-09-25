@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FACEIT MLBB - Login & Register</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .auth-container { display: flex; justify-content: center; align-items: center; min-height: 85vh; }
+    .auth-card { background: #1a1a1e; padding: 35px; border-radius: 12px; width: 380px; border: 1px solid #2a2a30; }
+    .auth-card h2 { text-align: center; color: #ff5500; margin-bottom: 20px; }
+    
+    .input-group { display: flex; gap: 10px; margin-bottom: 8px; }
+    input { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #333; background: #25252b; color: #fff; border-radius: 6px; outline: none; }
+    input:focus { border-color: #ff5500; }
+    
+    .verify-box { background: #202026; padding: 10px; border-radius: 6px; border: 1px dashed #444; margin: 10px 0; text-align: center; }
+    .ign-status { font-weight: bold; font-size: 14px; margin-top: 5px; }
+    .ign-found { color: #00ff66; }
+    .ign-error { color: #ff4444; }
+
+    .toggle-link { text-align: center; margin-top: 15px; font-size: 13px; color: #aaa; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2 id="form-title">FACEIT LOGIN</h2>
+
+      <!-- Бүртгүүлэх үед харагдах MLBB ID шалгах хэсэг -->
+      <div id="mlbb-verify-section" style="display: none;">
+        <label style="font-size: 12px; color: #aaa;">MLBB Акаунт шалгах:</label>
+        <div class="input-group">
+          <input type="number" id="mlbb-id" placeholder="User ID (д.х: 12345678)">
+          <input type="number" id="zone-id" placeholder="Server (1234)" style="width: 130px;">
+        </div>
+        
+        <button type="button" class="btn-secondary" id="btn-check-mlbb" style="width: 100%;">
+          🔍 Тоглоомын нэр шалгах
+        </button>
+
+        <div class="verify-box" id="verify-result" style="display: none;">
+          <span style="font-size: 12px; color: #888;">Олдсон MLBB Нэр:</span>
+          <div class="ign-status ign-found" id="fetched-ign">-</div>
+        </div>
+      </div>
+
+      <!-- Имэйл ба Нууц үг -->
+      <input type="email" id="email" placeholder="Имэйл хаяг" required>
+      <input type="password" id="password" placeholder="Нууц үг" required>
+
+      <button class="btn-primary" style="width: 100%; margin-top: 15px;" id="btn-submit">Нэвтрэх</button>
+      <div class="toggle-link" id="toggle-btn">Шинээр бүртгүүлэх</div>
+    </div>
+  </div>
+
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

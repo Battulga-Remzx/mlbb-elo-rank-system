@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <title>FACEIT MLBB - Dashboard</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+    .card { background: #1a1a1e; padding: 25px; border-radius: 12px; border: 1px solid #2a2a30; }
+    .level-badge { width: 70px; height: 70px; line-height: 70px; border-radius: 50%; background: #ff5500; font-size: 28px; font-weight: bold; margin: 0 auto 15px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo">FACEIT MLBB</div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="lobby.html">Lobby Room</a>
+      <a href="#" id="btn-logout">Гарах</a>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card" style="text-align: center;">
+      <div class="level-badge" id="lvl">-</div>
+      <h2 id="ign">Ачаалж байна...</h2>
+      <p style="color: #888; font-size: 14px;" id="mlbb-id">ID: -</p>
+      <div style="margin: 20px 0; background: #25252b; padding: 10px; border-radius: 8px; color: #ff5500; font-weight: bold;">
+        Elo: <span id="elo">0</span>
+      </div>
+      <button class="btn-primary" style="width: 100%;" onclick="location.href='lobby.html'">Тоглолтонд орох</button>
+    </div>
+
+    <div class="card">
+      <h3 style="color: #ff5500; margin-bottom: 15px;">СҮҮЛИЙН ТОГЛОЛТУУД</h3>
+      <p style="color: #aaa;">Түүх байхгүй байна.</p>
+    </div>
+  </div>
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
