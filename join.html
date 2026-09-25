@@ -4,34 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MLBB Lobby руу орох...</title>
-  <style>
-    body { background: #121214; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-align: center; padding: 20px; box-sizing: border-box; }
-    .box { background: #1a1a1e; padding: 40px 30px; border-radius: 12px; border: 1px solid #2a2a30; max-width: 400px; width: 100%; }
-    .spinner { width: 50px; height: 50px; border: 4px solid #2a2a30; border-top: 4px solid #ff5500; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    h2 { color: #ff5500; margin: 0 0 10px 0; }
-    p { color: #aaa; font-size: 14px; margin: 10px 0; }
-    .match-id { background: #121214; border: 1px solid #ff5500; color: #00ff66; font-size: 16px; font-weight: bold; padding: 8px 16px; border-radius: 6px; display: inline-block; margin: 15px 0; letter-spacing: 1px; word-break: break-all; }
-    .btn { display: inline-block; background: #ff5500; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; margin-top: 15px; font-size: 15px; }
-    .btn:hover { background: #e04b00; }
-    .btn-manual { background: #2196f3; margin-left: 5px; }
-    .btn-manual:hover { background: #1976d2; }
-    .manual-note { font-size: 12px; color: #666; margin-top: 20px; line-height: 1.6; }
-  </style>
+  <link rel="stylesheet" href="css/main.css">
 </head>
-<body>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;">
 
-  <div class="box">
+  <div style="background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-elevated)); padding: 48px 32px; border-radius: var(--radius-lg); border: 1px solid var(--border); max-width: 420px; width: 100%; text-align: center; box-shadow: var(--shadow-lg); position: relative; z-index: 1;">
     <div class="spinner"></div>
-    <h2>MLBB Lobby нээж байна...</h2>
-    <p>Хэрэв тоглоом автоматаар нээгдэхгүй бол доорх товчийг дарна уу:</p>
+    <h2 style="justify-content: center; font-size: 24px; margin-bottom: 16px;">MLBB Lobby нээж байна...</h2>
+    <p style="color: var(--text-secondary); font-size: 14px;">Хэрэв тоглоом автоматаар нээгдэхгүй бол доорх товчийг дарна уу:</p>
 
-    <div class="match-id" id="display-id">-----</div>
+    <div class="match-id-badge" id="display-id" style="margin: 20px 0;">-----</div>
     <br>
-    <a id="btn-open-app" class="btn" href="#">📱 MLBB Апп нээх</a>
-    <a id="btn-open-web" class="btn btn-manual" href="#" target="_blank">🌐 Вэбээр орох</a>
+    <a id="btn-open-app" class="btn-action" href="#" style="text-decoration: none; display: inline-block; margin: 6px 4px; padding: 12px 24px;">📱 MLBB Апп нээх</a>
+    <a id="btn-open-web" class="btn-action" href="#" target="_blank" style="text-decoration: none; display: inline-block; margin: 6px 4px; padding: 12px 24px; background: linear-gradient(135deg, #00aaff, #0088dd);">🌐 Вэбээр орох</a>
 
-    <p class="manual-note">
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 24px; line-height: 1.6;">
       💡 Хэрэв MLBB апп суулгаагүй бол "Вэбээр орох" товчийг дарж, дараа нь MLBB-ийн "Enter Lobby" товчийг дарна уу.
     </p>
   </div>
@@ -41,16 +28,14 @@
     const matchId = urlParams.get("id");
 
     if (!matchId) {
-      document.querySelector(".box").innerHTML = `
-        <h2 style="color:#ff4444;">Алдаа</h2>
-        <p>Match ID олдсонгүй. Линкээ шалгана уу.</p>
+      document.querySelector("body > div").innerHTML = `
+        <h2 style="color: var(--danger); justify-content: center;">⚠ Алдаа</h2>
+        <p style="color: var(--text-secondary);">Match ID олдсонгүй. Линкээ шалгана уу.</p>
       `;
     } else {
       document.getElementById("display-id").innerText = matchId;
-
       const webUrl = `https://play.mobilelegends.com/match/#/room?id=${matchId}&from=list`;
       const appUrl = `mobilelegends://play.mobilelegends.com/match/#/room?id=${matchId}&from=list`;
-
       document.getElementById("btn-open-app").href = appUrl;
       document.getElementById("btn-open-web").href = webUrl;
 
@@ -58,16 +43,11 @@
       document.addEventListener("visibilitychange", () => {
         if (document.hidden) appOpened = true;
       });
-
       window.location.href = appUrl;
-
       setTimeout(() => {
-        if (!appOpened && !document.hidden) {
-          window.location.href = webUrl;
-        }
+        if (!appOpened && !document.hidden) window.location.href = webUrl;
       }, 1500);
     }
   </script>
-
 </body>
 </html>

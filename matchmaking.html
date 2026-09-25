@@ -3,26 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FACEIT MLBB - Matchmaking</title>
+  <title>FACEIT MLBB — Matchmaking</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
-    body { background: #121214; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
-    nav { background: #1a1a1e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a30; flex-wrap: wrap; gap: 10px; }
-    nav a { color: #aaa; text-decoration: none; margin-left: 20px; font-weight: bold; }
-    nav a.active { color: #ff5500; }
-    .container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    .queue-box { background: #1a1a1e; padding: 30px; border-radius: 12px; border: 1px solid #2a2a30; text-align: center; margin-bottom: 30px; }
-    .btn-find { background: #ff5500; color: #fff; border: none; padding: 14px 40px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-    .btn-cancel { background: #333; color: #ff4444; border: 1px solid #ff4444; padding: 14px 40px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-    .player-list { background: #1a1a1e; border-radius: 12px; border: 1px solid #2a2a30; padding: 20px; }
-    .player-item { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #2a2a30; align-items: center; }
-    .player-item:last-child { border-bottom: none; }
+    .mode-selector {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .mode-card {
+      background: linear-gradient(135deg, rgba(26,26,36,0.9), rgba(32,32,44,0.9));
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px 32px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+      min-width: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mode-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 2px;
+      background: var(--accent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .mode-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 32px rgba(255, 85, 0, 0.2);
+    }
+    .mode-card:hover::before {
+      opacity: 1;
+    }
+    .mode-card.active {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(255,85,0,0.15), rgba(255,119,34,0.05));
+      box-shadow: 0 8px 32px rgba(255, 85, 0, 0.3);
+    }
+    .mode-card.active::before {
+      opacity: 1;
+    }
+    .mode-icon {
+      font-size: 42px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .mode-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .mode-card.active .mode-title {
+      color: var(--accent);
+    }
+    .mode-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
 
   <nav>
-    <div style="font-weight: bold; color: #ff5500; font-size: 20px;">FACEIT MLBB</div>
+    <div>FACEIT MLBB</div>
     <div>
       <a href="dashboard.html">Dashboard</a>
       <a href="lobbies.html">Lobbies</a>
@@ -32,15 +89,37 @@
   </nav>
 
   <div class="container">
-    <div class="queue-box">
-      <h2>5v5 MATCHMAKING</h2>
-      <p id="queue-status" style="color: #aaa;">Тоглоом хайж эхлэхийн тулд дараах товчийг дарна уу.</p>
-      <button id="btn-toggle-queue" class="btn-find">FIND MATCH</button>
+    <!-- MODE СОНГОЛТ -->
+    <h2 style="justify-content: center; text-align: center; margin-bottom: 16px;">⚔ ТОГЛООМЫН ГОРИМ СОНГОХ</h2>
+    <div class="mode-selector">
+      <div class="mode-card active" data-mode="5v5" id="mode-5v5">
+        <span class="mode-icon">🏆</span>
+        <div class="mode-title">5v5</div>
+        <div class="mode-desc">БАГИЙН ТОГЛООМ · 10 ТОГЛОГЧ</div>
+      </div>
+      <div class="mode-card" data-mode="1v1" id="mode-1v1">
+        <span class="mode-icon">⚔</span>
+        <div class="mode-title">1v1</div>
+        <div class="mode-desc">ГАНЦ ТОГЛООМ · 2 ТОГЛОГЧ</div>
+      </div>
     </div>
 
-    <h3>Дараалалд байгаа тоглогчид (<span id="queue-count">0</span>/10)</h3>
+    <div class="queue-box">
+      <h2 id="queue-title">🏆 5v5 MATCHMAKING</h2>
+      <p id="queue-status" style="color: var(--text-secondary); margin: 16px 0;">
+        Тоглоом хайж эхлэхийн тулд дараах товчийг дарна уу.
+      </p>
+      <button id="btn-toggle-queue" class="btn-find">🔍 FIND MATCH</button>
+    </div>
+
+    <h2>
+      Дараалалд байгаа тоглогчид 
+      (<span id="queue-count" style="color: var(--accent);">0</span>/<span id="queue-max">10</span>)
+    </h2>
     <div class="player-list" id="player-container">
-      <p style="text-align: center; color: #666;">Хүлээгдэж буй тоглогч байхгүй байна.</p>
+      <p style="text-align: center; color: var(--text-muted); padding: 20px;">
+        Хүлээгдэж буй тоглогч байхгүй байна.
+      </p>
     </div>
   </div>
 

@@ -3,43 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FACEIT MLBB - Dashboard</title>
+  <title>FACEIT MLBB — Dashboard</title>
   <link rel="stylesheet" href="css/main.css">
-  <style>
-    body { background: #121214; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
-    nav { background: #1a1a1e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a30; flex-wrap: wrap; gap: 10px; }
-    nav a { color: #aaa; text-decoration: none; margin-left: 20px; font-weight: bold; }
-    nav a.active, nav a:hover { color: #ff5500; }
-    .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-    .profile-card { background: #1a1a1e; padding: 30px; border-radius: 12px; border: 1px solid #2a2a30; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-    .user-info h2 { margin: 0 0 10px 0; color: #ff5500; }
-    .user-info p { margin: 5px 0; color: #aaa; font-size: 14px; }
-    .badge { background: #ff5500; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 25px; }
-    .stat-box { background: #1a1a1e; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #2a2a30; }
-    .stat-box h3 { margin: 0; font-size: 24px; color: #00ff66; }
-    .stat-box p { margin: 5px 0 0 0; color: #888; font-size: 12px; }
-    .btn-danger { background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-    .btn-edit { background: #2196f3; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 10px; font-size: 13px; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; }
-    .modal-content { background: #1a1a1e; padding: 30px; border-radius: 12px; width: 350px; border: 1px solid #2a2a30; max-width: 90%; }
-    .modal-content h3 { color: #ff5500; margin-top: 0; }
-    .modal-content input { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #333; background: #25252b; color: #fff; border-radius: 6px; box-sizing: border-box; }
-    .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-    .modal-actions button { flex: 1; padding: 10px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
-    @media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-  </style>
 </head>
 <body>
 
   <nav>
-    <div style="font-weight: bold; color: #ff5500; font-size: 20px;">FACEIT MLBB</div>
+    <div>FACEIT MLBB</div>
     <div>
       <a href="dashboard.html" class="active">Dashboard</a>
       <a href="lobbies.html">Lobbies</a>
       <a href="matchmaking.html">Matchmaking</a>
       <a href="leaderboard.html">Leaderboard</a>
-      <button id="btn-logout" class="btn-danger" style="margin-left: 20px;">Гарчлах</button>
+      <button id="btn-logout" class="btn-danger" style="margin-left:16px;">Гарчлах</button>
     </div>
   </nav>
 
@@ -47,21 +23,23 @@
     <div class="profile-card">
       <div class="user-info">
         <h2 id="user-ign">Ачаалж байна...</h2>
-        <p>MLBB ID: <span id="user-mlbb" style="color:#fff;">-</span></p>
-        <p>Имэйл: <span id="user-email" style="color:#fff;">-</span></p>
+        <p>MLBB ID: <span id="user-mlbb">-</span></p>
+        <p>Имэйл: <span id="user-email">-</span></p>
       </div>
       <div style="text-align: right;">
-        <div style="font-size: 32px; font-weight: bold; color: #ff5500;" id="user-elo">1000</div>
-        <span class="badge" id="user-level">LEVEL 3</span>
-        <button class="btn-edit" id="btn-edit-mlbb">✏️ MLBB ID Засах</button>
+        <div style="font-size: 42px; font-weight: 800; font-family: 'Rajdhani', sans-serif; color: var(--accent); text-shadow: 0 0 30px var(--accent-glow);" id="user-elo">1000</div>
+        <div style="margin-top: 8px;">
+          <span class="badge" id="user-level">LEVEL 3</span>
+        </div>
+        <button class="btn-edit" id="btn-edit-mlbb" style="margin-top: 12px;">✏️ MLBB ID Засах</button>
       </div>
     </div>
 
     <div class="stats-grid">
-      <div class="stat-box"><h3 id="stat-matches">0</h3><p>Нийт тоглолт</p></div>
-      <div class="stat-box"><h3 id="stat-wins" style="color: #00ff66;">0</h3><p>Хожил</p></div>
-      <div class="stat-box"><h3 id="stat-losses" style="color: #ff4444;">0</h3><p>Хожигдол</p></div>
-      <div class="stat-box"><h3 id="stat-winrate" style="color: #ffbb00;">0%</h3><p>Winrate</p></div>
+      <div class="stat-box"><h3 id="stat-matches" style="color: var(--text-primary);">0</h3><p>Нийт тоглолт</p></div>
+      <div class="stat-box"><h3 id="stat-wins" style="color: var(--success);">0</h3><p>Хожил</p></div>
+      <div class="stat-box"><h3 id="stat-losses" style="color: var(--danger);">0</h3><p>Хожигдол</p></div>
+      <div class="stat-box"><h3 id="stat-winrate" style="color: var(--warning);">0%</h3><p>Winrate</p></div>
     </div>
   </div>
 
@@ -72,8 +50,8 @@
       <input type="number" id="edit-mlbb-id" placeholder="MLBB User ID">
       <input type="number" id="edit-zone-id" placeholder="Server/Zone ID">
       <div class="modal-actions">
-        <button id="btn-cancel-edit" style="background:#333; color:#fff;">Болих</button>
-        <button id="btn-save-edit" style="background:#ff5500; color:#fff;">Хадгалах</button>
+        <button id="btn-cancel-edit" class="btn-secondary">Болих</button>
+        <button id="btn-save-edit" class="btn-primary">Хадгалах</button>
       </div>
     </div>
   </div>

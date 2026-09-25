@@ -3,80 +3,261 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FACEIT MLBB - Lobby Room</title>
+  <title>FACEIT MLBB — Lobby Room</title>
   <link rel="stylesheet" href="css/main.css">
   <style>
-    body { background: #121214; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
-    nav { background: #1a1a1e; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a30; }
-    .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-    .room-header { background: #1a1a1e; padding: 25px; border-radius: 12px; border: 1px solid #2a2a30; text-align: center; margin-bottom: 25px; }
-    .timer-display { background: #222; padding: 8px 16px; border-radius: 6px; display: inline-block; margin-top: 10px; color: #ffbb00; font-weight: bold; }
-    .qr-box { background: #222; border: 2px dashed #ff5500; padding: 20px; border-radius: 12px; margin: 20px 0; display: inline-block; width: 80%; max-width: 500px; }
-    .qr-img { width: 220px; height: 220px; background: #fff; padding: 10px; border-radius: 8px; margin: 10px auto; display: block; }
-    .btn-action { background: #ff5500; color: #fff; border: none; padding: 10px 20px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-    .btn-sync { background: #00c853; color: #000; border: none; padding: 12px 28px; font-weight: bold; font-size: 16px; border-radius: 6px; cursor: pointer; margin-top: 15px; }
-    .btn-sync:disabled { background: #444; color: #888; cursor: not-allowed; }
-    .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .team-box { background: #1a1a1e; border-radius: 12px; border: 1px solid #2a2a30; padding: 20px; }
-    .team-box.radiant { border-top: 4px solid #00c853; }
-    .team-box.dire { border-top: 4px solid #ff1744; }
-    .player-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #2a2a30; font-size: 14px; align-items: center; }
-    .player-row:last-child { border-bottom: none; }
-    @media (max-width: 700px) { .teams-grid { grid-template-columns: 1fr; } }
+    .screenshot-section {
+      background: rgba(0, 170, 255, 0.05);
+      border: 1px solid rgba(0, 170, 255, 0.3);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .screenshot-section h3 {
+      color: var(--info);
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-family: 'Rajdhani', sans-serif;
+      letter-spacing: 1px;
+    }
+    .screenshot-section p {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    #screenshot-input {
+      padding: 10px;
+      font-size: 13px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px dashed var(--info);
+      border-radius: var(--radius-sm);
+      width: 100%;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    #screenshot-input:hover {
+      border-color: var(--accent);
+      background: rgba(0, 170, 255, 0.1);
+    }
+    .ocr-progress {
+      display: none;
+      margin-top: 12px;
+    }
+    .ocr-progress-bar-wrapper {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      overflow: hidden;
+      height: 8px;
+    }
+    .ocr-progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--warning));
+      transition: width 0.3s;
+    }
+    .ocr-status {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-align: center;
+    }
+    .ocr-result {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--success);
+    }
+    .ocr-result h4 {
+      color: var(--success);
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    .ocr-data {
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--text-secondary);
+    }
+    .ocr-data strong {
+      color: var(--text-primary);
+    }
+    .ocr-team-blue {
+      color: var(--info);
+      font-weight: 700;
+    }
+    .ocr-team-red {
+      color: var(--danger);
+      font-weight: 700;
+    }
+    .ocr-player-list {
+      margin: 4px 0 0 12px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .ocr-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .ocr-actions button {
+      flex: 1;
+      min-width: 140px;
+    }
+    .btn-apply-ocr {
+      background: linear-gradient(135deg, var(--success), #00cc66);
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px var(--success-glow);
+      transition: var(--transition);
+    }
+    .btn-apply-ocr:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--success-glow);
+    }
+    .btn-apply-ocr:disabled {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .ocr-warning {
+      background: rgba(255, 187, 0, 0.1);
+      border: 1px solid rgba(255, 187, 0, 0.4);
+      color: var(--warning);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
   <nav>
-    <div style="font-weight: bold; color: #ff5500; font-size: 20px;">FACEIT MLBB</div>
-    <div><a href="lobbies.html" style="color:#aaa; text-decoration:none;">← Өрөөнөөс гарах</a></div>
+    <div>FACEIT MLBB</div>
+    <div><a href="lobbies.html">← Өрөөнөөс гарах</a></div>
   </nav>
 
   <div class="container">
     <div class="room-header">
-      <h2 id="room-title">LOBBY ROOM</h2>
+      <h2 id="room-title" style="justify-content: center;">LOBBY ROOM</h2>
       <div id="auto-close-timer" class="timer-display" style="display:none;">⏱ 5:00 үлдсэн</div>
       
-      <div id="host-controls" style="display: none; background: #222; padding: 15px; border-radius: 8px; margin: 15px 0;">
-        <p style="margin:0 0 10px 0; color:#ff5500;">👑 Та өрөөний Host тул Moonton дээр Match нээж ID-гаа оруулна уу:</p>
-        <a href="https://play.mobilelegends.com/match/" target="_blank" style="color:#2196f3; font-weight:bold;">1. play.mobilelegends.com дээр өрөө үүсгэх</a><br><br>
-        <input type="text" id="input-moonton-id" placeholder="Moonton Match ID оруулна уу" style="padding:8px; width:220px;">
-        <button id="btn-save-id" class="btn-action">QR Үүсгэх & Шарлах</button>
+      <!-- HOST CONTROLS -->
+      <div id="host-controls" style="display: none; background: rgba(255,85,0,0.08); padding: 20px; border-radius: var(--radius-md); margin: 20px 0; border: 1px solid rgba(255,85,0,0.3);">
+        <p style="margin:0 0 12px 0; color: var(--accent); font-weight: 700;">
+          👑 Та өрөөний Host — Moonton-с Match ID авна уу:
+        </p>
+        <a href="https://play.mobilelegends.com/match/" target="_blank" style="color: var(--info); font-weight: 700; text-decoration: none;">
+          1. play.mobilelegends.com нээх →
+        </a><br><br>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+          <input type="text" id="input-moonton-id" placeholder="Moonton Match ID" style="padding:10px; max-width: 280px; margin: 0;">
+          <button id="btn-save-id" class="btn-action">QR Үүсгэх</button>
+        </div>
       </div>
 
+      <!-- QR ХЭСЭГ -->
       <div class="qr-box">
         <div id="qr-container" style="display: none;">
-          <p style="margin: 0; color: #aaa;">Утсаараа MLBB-ийн Камераар уншуулж орно уу:</p>
-          <img id="qr-image" class="qr-img" src="" alt="QR Code">
-          <div>MATCH ID: <strong id="display-match-id" style="color: #00ff66; font-size: 20px; word-break: break-all;">-----</strong></div>
+          <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+            📱 Утсаараа MLBB камераар уншуулна уу:
+          </p>
+          <div class="qr-container">
+            <img id="qr-image" class="qr-img" src="" alt="QR Code">
+          </div>
+          <div>
+            <span style="font-size: 11px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase;">
+              Match Room ID
+            </span>
+            <div id="display-match-id" class="match-id-badge">-----</div>
+          </div>
           <br>
-          <a id="enter-lobby-link" href="#" target="_blank" class="btn-action" style="text-decoration: none; display: inline-block; background: #2196f3;">
+          <a id="enter-lobby-link" href="#" target="_blank" class="btn-action" 
+             style="background: linear-gradient(135deg, #00aaff, #0088dd); margin-top: 12px;">
             🌐 Enter Lobby (Web)
           </a>
         </div>
-        <div id="qr-placeholder" style="color: #888;">
+        <div id="qr-placeholder" style="color: var(--text-muted); padding: 20px;">
           ⏳ Host хараахан Match ID оруулаагүй байна...
         </div>
       </div>
 
-      <div>
-        <button id="btn-sync-result" class="btn-sync">🔄 Тоглолт Дууссан → ELO Бодох</button>
+      <!-- 📸 SCREENSHOT OCR ХЭСЭГ -->
+      <div id="screenshot-section" class="screenshot-section" style="display: none;">
+        <h3>📸 Эсвэл Screenshot-аас уншуулах</h3>
+        <p>
+          Тоглолтын үр дүнгийн screenshot-ыг оруулна уу 
+          (<strong>play.mobilelegends.com</strong>-с авсан).
+        </p>
+        
+        <input type="file" id="screenshot-input" accept="image/*">
+        
+        <div id="ocr-progress" class="ocr-progress">
+          <div class="ocr-progress-bar-wrapper">
+            <div id="ocr-progress-bar" class="ocr-progress-bar"></div>
+          </div>
+          <p id="ocr-status" class="ocr-status">Бэлдэж байна...</p>
+        </div>
+        
+        <div id="ocr-result" class="ocr-result">
+          <h4>✓ Уншсан мэдээлэл</h4>
+          <div id="ocr-data" class="ocr-data"></div>
+          
+          <div id="ocr-editable" style="display:none; margin-top: 12px;">
+            <details style="color: var(--text-secondary); font-size: 12px;">
+              <summary style="cursor: pointer; color: var(--warning); margin-bottom: 8px;">
+                ✏️ Гараар засах (хэрэв OCR буруу уншсан бол)
+              </summary>
+              <div id="ocr-edit-container" style="margin-top: 8px;"></div>
+            </details>
+          </div>
+          
+          <div class="ocr-actions">
+            <button id="btn-apply-ocr" class="btn-apply-ocr">
+              ✓ Баталгаажуулах & ELO Бодох
+            </button>
+            <button id="btn-clear-ocr" class="btn-secondary">
+              ✖ Цуцлах
+            </button>
+          </div>
+        </div>
       </div>
+
+      <!-- ELO БОДОХ (Moonton API) -->
+      <button id="btn-sync-result" class="btn-sync" style="margin-top: 20px; padding: 14px 32px;">
+        🔄 Moonton API-с ELO Бодох
+      </button>
+      <p id="sync-status" style="font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: center;"></p>
     </div>
 
+    <!-- БАГУУД -->
     <div class="teams-grid">
       <div class="team-box radiant">
-        <h3 style="color: #00c853; margin-top: 0; display:flex; justify-content:space-between; align-items:center;">
-          <span>TEAM RADIANT</span>
-          <button id="btn-join-radiant" class="btn-action" style="font-size:12px;">Энэ багт орох</button>
+        <h3 style="display:flex; justify-content:space-between; align-items:center;">
+          <span>⚔ TEAM RADIANT</span>
+          <button id="btn-join-radiant" class="btn-action" style="font-size:11px; padding: 8px 14px;">
+            Орох
+          </button>
         </h3>
         <div id="team-radiant-list">Хоосон байна...</div>
       </div>
 
       <div class="team-box dire">
-        <h3 style="color: #ff1744; margin-top: 0; display:flex; justify-content:space-between; align-items:center;">
-          <span>TEAM DIRE</span>
-          <button id="btn-join-dire" class="btn-action" style="font-size:12px;">Энэ багт орох</button>
+        <h3 style="display:flex; justify-content:space-between; align-items:center;">
+          <span>🔥 TEAM DIRE</span>
+          <button id="btn-join-dire" class="btn-action" style="font-size:11px; padding: 8px 14px;">
+            Орох
+          </button>
         </h3>
         <div id="team-dire-list">Хоосон байна...</div>
       </div>
